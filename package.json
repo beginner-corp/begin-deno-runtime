@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "cp -r src dist",
+    "package": "zip -r deno-1.0.0-rc1.zip dist/",
+    ":::::": "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
+    "start": "npm run clean && npm run build && npm run package && npm run clean",
+    "publish": "aws s3 cp deno-1.0.0-rc1.zip s3://begin-deno-runtime/deno-1.0.0-rc1.zip"
+  }
+}
