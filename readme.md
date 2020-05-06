@@ -6,3 +6,4 @@ this repo holds the deno runtime which we publish as a lambda layer for begin.co
 2. Overwrite `src/bin/deno` with the new binary; ensure `chmod +x src/bin/deno`
 3. Modify `package.json` with the correct version numbers and run `npm run start` to compile the layer
 4. `npm run publish` to publish the layer to the `begin-deno-runtime` bucket
+5. create new layers in root lambda console and call fix.sh to ensure they can be read by everyone
