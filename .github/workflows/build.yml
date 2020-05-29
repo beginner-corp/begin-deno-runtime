@@ -43,6 +43,7 @@ jobs:
         run: |
           curl -fsSL https://github.com/denoland/deno/releases/download/v$DENO_VERSION/deno_src.tar.gz --output deno.tar.gz
           tar -zxf deno.tar.gz
+          ls -la
 
       # - name: Build
       #   run: |
