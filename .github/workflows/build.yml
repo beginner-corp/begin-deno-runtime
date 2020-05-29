@@ -17,7 +17,9 @@ jobs:
     # Go
     steps:
       - name: Set Deno version
-        run: echo Setting Deno version '::set-env name=DENO_VERSION::1.0.0'
+        run: |
+          ::set-env name=DENO_VERSION::1.0.0
+          echo "Setting Deno version ${{ github.DENO_VERSION }}"
 
       - name: Check out repo
         uses: actions/checkout@v2
