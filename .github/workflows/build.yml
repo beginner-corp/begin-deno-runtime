@@ -44,10 +44,12 @@ jobs:
           curl -fsSL https://github.com/denoland/deno/releases/download/v$DENO_VERSION/deno_src.tar.gz --output deno.tar.gz
           tar -zxf deno.tar.gz
 
-      # - name: Build
-      #   run: |
-      #     cd deno/cli
-      #     cargo install --locked --root .. --path .
+      - name: Build
+        run: |
+          cd deno/cli
+          cargo --version
+
+  # cargo install --locked --root .. --path .
 
       - name: Copy bin to S3
         run: aws s3 cp readme.md s3://begin-deno-runtime/deno-$DENO_VERSION
