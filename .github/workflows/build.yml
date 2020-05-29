@@ -38,7 +38,7 @@ jobs:
 
       - name: Env
         run: |
-          echo "Deno ver:   ${{ DENO_VERSION }}"
+          echo "Deno ver:   ${{ github.DENO_VERSION }}"
           echo "Event name: ${{ github.event_name }}"
           echo "Git ref:    ${{ github.ref }}"
           echo "GH actor:   ${{ github.actor }}"
