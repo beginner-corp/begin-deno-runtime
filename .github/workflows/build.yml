@@ -17,17 +17,15 @@ jobs:
     # Go
     steps:
       - name: Set Deno version
-        run: |
-          ::set-env name=DENO_VERSION::1.0.0
-          echo "Setting Deno version ${{ github.DENO_VERSION }}"
+        run: echo ::set-env name=DENO_VERSION::1.0.0
 
-      - name: Check out repo
-        uses: actions/checkout@v2
+      # - name: Check out repo
+      #   uses: actions/checkout@v2
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+      # - name: Set up Rust
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
         # uses: actions-rs/cargo@v1
         # with:
         #   command: build
