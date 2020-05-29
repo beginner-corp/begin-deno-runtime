@@ -41,6 +41,8 @@ jobs:
 
       - name: Env
         run: |
+          echo $DENO_VERSION
+          echo $deno_version
           echo "Deno ver:   ${{ github.deno_version }}"
           echo "Event name: ${{ github.event_name }}"
           echo "Git ref:    ${{ github.ref }}"
