@@ -1,5 +1,4 @@
 {
-  "version": "1.0.2",
   "scripts": {
     "clean": "rm -rf dist",
     "build": "cp -r src dist",
