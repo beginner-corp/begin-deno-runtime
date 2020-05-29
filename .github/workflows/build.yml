@@ -18,6 +18,13 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+        # uses: actions-rs/cargo@v1
+        # with:
+        #   command: build
+        #   args: --release --all-features
 
 #       - name: Set up Node.js
 #         uses: actions/setup-node@v1
@@ -36,10 +43,16 @@ jobs:
           curl -fsSL https://github.com/denoland/deno/releases/download/v1.0.0/deno_src.tar.gz --output deno.tar.gz
           tar -zxf deno.tar.gz
 
-      - name: Builds
+      - name: Build
         run: |
-          cd cli
+          ls -la
+          cd deno/cli
           cargo install --locked --root .. --path .
+
+      # - name: Copy bin to S3
+      #   run:
+
+        # west 1
 
 #       - name: Hydrate
 #         run: npx hydrate
