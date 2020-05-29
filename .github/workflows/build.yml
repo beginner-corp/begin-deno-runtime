@@ -11,7 +11,7 @@ jobs:
     # Setup
     runs-on: ubuntu-latest
     steps:
-      - name: Set selected color
+      - name: Set Deno version
         run: echo Setting Deno version '::set-env name=DENO_VERSION::1.0.0'
 
 
@@ -44,7 +44,7 @@ jobs:
 
       - name: Env
         run: |
-          echo "Deno ver:   ${{ github.DENO_VERSION }}"
+          echo "Deno ver:   ${ DENO_VERSION }"
           echo "Event name: ${{ github.event_name }}"
           echo "Git ref:    ${{ github.ref }}"
           echo "GH actor:   ${{ github.actor }}"
