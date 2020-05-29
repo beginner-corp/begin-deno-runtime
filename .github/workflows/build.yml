@@ -43,15 +43,18 @@ jobs:
         run: |
           curl -fsSL https://github.com/denoland/deno/releases/download/v$DENO_VERSION/deno_src.tar.gz --output deno.tar.gz
           tar -zxf deno.tar.gz
-          ls -la
 
       # - name: Build
       #   run: |
       #     cd deno/cli
       #     cargo install --locked --root .. --path .
 
-      # - name: Copy bin to S3
-      #   run: aws s3 cp deno s3://begin-deno-runtime/deno-$DENO_VERSION
+      - name: Copy bin to S3
+        run: aws s3 cp readme.md s3://begin-deno-runtime/deno-$DENO_VERSION
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: us-west-1
 
         # west 1
 
