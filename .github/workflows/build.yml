@@ -6,15 +6,6 @@ on: [ push ]
 
 jobs:
 
-  # Set the Deno version
-  env:
-    # Setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set Deno version
-        run: echo Setting Deno version '::set-env name=DENO_VERSION::1.0.0'
-
-
   # Test the build
   build:
     # Setup
@@ -25,6 +16,9 @@ jobs:
 
     # Go
     steps:
+      - name: Set Deno version
+        run: echo Setting Deno version '::set-env name=DENO_VERSION::1.0.0'
+
       - name: Check out repo
         uses: actions/checkout@v2
 
@@ -44,7 +38,7 @@ jobs:
 
       - name: Env
         run: |
-          echo "Deno ver:   ${ DENO_VERSION }"
+          echo "Deno ver:   ${{ DENO_VERSION }}"
           echo "Event name: ${{ github.event_name }}"
           echo "Git ref:    ${{ github.ref }}"
           echo "GH actor:   ${{ github.actor }}"
