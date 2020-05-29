@@ -2,6 +2,9 @@ name: Node CI
 
 env:
   DENO_VERSION: 1.0.2
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: us-west-1
 
 # Push tests commits; pull_request tests PR merges
 on: [ push ]
@@ -13,23 +16,16 @@ jobs:
   build:
     # Setup
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     node-version: [10.x]
 
     # Go
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
 
-      # - name: Set up Rust
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: stable
-        # uses: actions-rs/cargo@v1
-        # with:
-        #   command: build
-        #   args: --release --all-features
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
 
       - name: Env
         run: |
@@ -47,87 +43,20 @@ jobs:
       - name: Build
         run: |
           cd deno/cli
-          cargo --version
-
-  # cargo install --locked --root .. --path .
+          cargo install --locked --root .. --path .
 
       - name: Copy bin to S3
-        run: aws s3 cp readme.md s3://begin-deno-runtime/deno-$DENO_VERSION
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-west-1
+        run: aws s3 cp deno s3://begin-deno-runtime/deno-$DENO_VERSION
 
-        # west 1
+      - name: Publish layer
+        run: node ./do-fun-stuff-here-brian
 
-
-
-
-
-
-
-
-
-
-#       - name: Hydrate
-#         run: npx hydrate
-#         env:
-#           CI: true
-#           ARC_MAX_NPM: 10
-
-#       - name: Test
-#         run: npm test
-
-#       - name: Notify
-#         uses: homoluctus/slatify@master
-#         # Only fire alert once; may need `&& matrix.node-version == '10.x' && matrix.os == 'ubuntu-latest'` later
-#         if: github.ref == 'refs/heads/master' && failure()
-#         with:
-#           type: ${{ job.status }}
-#           job_name: '*Build*'
-#           url: ${{ secrets.SLACK_WEBHOOK }}
-#           commit: true
-#           token: ${{ secrets.GITHUB_TOKEN }}
-
-#   # Assuming all that went fine (and it's master): deploy!
-#   deploy:
-#     # Setup
-#     needs: build
-#     if: github.ref == 'refs/heads/master'
-#     runs-on: ubuntu-latest
-
-#     # Go
-#     steps:
-#       - name: Check out repo
-#         uses: actions/checkout@v1
-
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v1
-#         with:
-#           node-version: 10
-
-#       - name: Create ~/.aws/credentials
-#         env:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         run: mkdir $HOME/.aws && printf "[smallwins]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\nregion=us-west-1\n" > $HOME/.aws/credentials && cat $HOME/.aws/credentials
-
-#       - name: Install
-#         run: npm ci
-
-#       - name: Deploy
-#         run: npm run deploy
-#         env:
-#           CI: true
-#           ARC_MAX_NPM: 10
-#           AWS_PROFILE: smallwins
-
-#       - name: Notify
-#         uses: homoluctus/slatify@master
-#         if: always()
-#         with:
-#           type: ${{ job.status }}
-#           job_name: '*Deploy*'
-#           url: ${{ secrets.SLACK_WEBHOOK }}
-#           commit: true
-#           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Notify
+        uses: homoluctus/slatify@master
+        if: always()
+        with:
+          type: ${{ job.status }}
+          job_name: '*Deno build*'
+          url: ${{ secrets.SLACK_WEBHOOK }}
+          commit: true
+          token: ${{ secrets.GITHUB_TOKEN }}
