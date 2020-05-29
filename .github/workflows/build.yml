@@ -48,8 +48,8 @@ jobs:
       - name: Copy bin to S3
         run: aws s3 cp deno s3://begin-deno-runtime/deno-$DENO_VERSION
 
-      - name: Publish layer
-        run: node ./do-fun-stuff-here-brian
+      # - name: Publish layer
+      #   run: node ./do-fun-stuff-here-brian
 
       - name: Notify
         uses: homoluctus/slatify@master
