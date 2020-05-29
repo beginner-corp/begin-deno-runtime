@@ -1,5 +1,8 @@
 name: Node CI
 
+env:
+  deno_version: 1.0.0
+
 # Push tests commits; pull_request tests PR merges
 on: [ push ]
 # on: [ push, pull_request ]
@@ -16,8 +19,8 @@ jobs:
 
     # Go
     steps:
-      - name: Set Deno version
-        run: echo ::set-env name=deno_version::1.0.0
+      # - name: Set Deno version
+      #   run: echo ::set-env name=deno_version::1.0.0
 
       # - name: Check out repo
       #   uses: actions/checkout@v2
