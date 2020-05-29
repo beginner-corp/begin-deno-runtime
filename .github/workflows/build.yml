@@ -22,10 +22,10 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v2
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+      # - name: Set up Rust
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
         # uses: actions-rs/cargo@v1
         # with:
         #   command: build
