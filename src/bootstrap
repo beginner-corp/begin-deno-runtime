@@ -1,29 +1,3 @@
 #!/bin/sh
 set -euo pipefail
-
-SCRIPT_DIR=$(cd $(dirname $0); pwd)
-HANDLER_NAME=$(echo "$_HANDLER" | cut -d. -f2)
-HANDLER_FILE=$(echo "$_HANDLER" | cut -d. -f1)
-
-echo "
-import { $HANDLER_NAME } from '$LAMBDA_TASK_ROOT/$HANDLER_FILE.ts';
-const API_ROOT = 'http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/';
-
-(async () => {
-  while (true) {
-    const next = await fetch(API_ROOT + 'next');
-    const reqId = next.headers.get('Lambda-Runtime-Aws-Request-Id');
-    const res = await $HANDLER_NAME(await next.json());
-    await (await fetch(
-      API_ROOT + reqId + '/response',
-      {
-        method: 'POST',
-        body: JSON.stringify(res)
-      }
-    )).blob();
-  }
-})();
-
-" > /tmp/runtime.ts
-
-DENO_DIR=/tmp/deno_dir deno run -A --unstable /tmp/runtime.ts
+DENO_DIR=/tmp/deno_dir deno run -A --unstable /opt/runtime.ts
