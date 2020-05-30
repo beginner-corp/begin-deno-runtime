@@ -1,5 +1,6 @@
 // coldstart here
 let env = Deno.env.toObject();
+let api = env.AWS_LAMBDA_RUNTIME_API;
 let name = env._HANDLER.split(".")[0];
 let method = env._HANDLER.split(".")[1];
 
@@ -15,27 +16,20 @@ if (found) {
 
 // if entry file is missing or invalid bail hard with a meaningful error
 if (!found) {
-  let url =
-    `http://${env.AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/init/error`;
-  let fail = await fetch(url, {
-    method: "POST",
-    body: JSON.stringify({
-      errorType: "HandlerNotFound",
-      errorMessage: `expected "${path}" to export a function named "${method}"`,
-    }),
+  await post(`http://${api}/2018-06-01/runtime/init/error`, {
+    errorType: "HandlerNotFound",
+    errorMessage: `expected "${path}" to export a function named "${method}"`,
   });
-  await fail.blob();
   Deno.exit(1);
 }
 
 // start the event loop
 while (true) {
   // massage invocation payload
-  let invoke = "2018-06-01/runtime/invocation";
-  let root = `http://${env.AWS_LAMBDA_RUNTIME_API}/${invoke}`;
-  let next = await fetch(`${root}/next`);
+  let invoke = `http://${api}/2018-06-01/runtime/invocation`;
+  let next = await fetch(`${invoke}/next`);
   let event = await next.json();
-  let req = next.headers.get("Lambda-Runtime-Aws-Request-Id");
+  let reqID = next.headers.get("Lambda-Runtime-Aws-Request-Id");
   let context = {
     awsRequestId: next.headers.get("lambda-runtime-aws-request-id"),
     invokedFunctionArn: next.headers.get("lambda-runtime-invoked-function-arn"),
@@ -46,31 +40,28 @@ while (true) {
     memoryLimitInMB: env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE,
   };
 
+  // invoke the handler
   try {
-    // invoke the handler
     let res = await handler(event, context);
-    // echo to lambda
-    let url = `${root}/${req}/response`;
-    let result = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(res),
-    });
-    await result.blob();
+    await post(`${invoke}/${reqID}/response`, res);
   } catch (err) {
-    // any issue? bubble errors ~always~
-    let url = `${root}/${req}/error`;
-    let fail = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify({
-        errorType: err.name,
-        errorMessage: err.message,
-        stackTrace: err.stack,
-      }),
+    await post(`${invoke}/${reqID}/error`, {
+      errorType: err.name,
+      errorMessage: err.message,
+      stackTrace: err.stack,
     });
-    await fail.blob();
   }
 
   // end while
+}
+
+/** helper to post message to lambda */
+async function post(url: string, payload: object) {
+  let result = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  await result.blob();
 }
 
 /** helper to check for the entry file */
