@@ -3,24 +3,42 @@ let env = Deno.env.toObject();
 let api = env.AWS_LAMBDA_RUNTIME_API;
 let name = env._HANDLER.split(".")[0];
 let method = env._HANDLER.split(".")[1];
-let path = `${env.LAMBDA_TASK_ROOT}/${name}.ts`;
 let invoke = `http://${api}/2018-06-01/runtime/invocation`;
 let error = `http://${api}/2018-06-01/runtime/init/error`;
 
+// look for index.{js,ts,tsx} and fallback to mod.{js,ts,tsx}
+let paths = [
+  `${env.LAMBDA_TASK_ROOT}/index.js`,
+  `${env.LAMBDA_TASK_ROOT}/mod.js`,
+  `${env.LAMBDA_TASK_ROOT}/index.ts`,
+  `${env.LAMBDA_TASK_ROOT}/mod.ts`,
+  `${env.LAMBDA_TASK_ROOT}/index.tsx`,
+  `${env.LAMBDA_TASK_ROOT}/mod.tsx`,
+];
+
 // get the handler entry file
+let found = false;
 let handler;
-let found = await exists(path);
-if (found) {
-  let mod = await import(path);
-  handler = mod[method];
-  if (!handler) found = false;
+
+for (let path of paths) {
+  found = await exists(path);
+  if (found) {
+    let mod = await import(path);
+    handler = mod[method];
+    if (typeof handler != "function") {
+      found = false;
+    } else {
+      break;
+    }
+  }
 }
 
 // if entry file is missing or invalid bail hard with a meaningful error
-if (!found) {
+if (found === false) {
   await post(error, {
     errorType: "HandlerNotFound",
-    errorMessage: `expected "${path}" to export a function named "${method}"`,
+    errorMessage:
+      `expected one of mod.js, mod.ts, mod.tsx, index.js, index.ts, or index.tsx to export a function named "${method}"`,
   });
   Deno.exit(1);
 }
