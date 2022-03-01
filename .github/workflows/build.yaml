@@ -34,3 +34,7 @@ jobs:
       - name: Upload to S3
         run: |
           aws s3 cp deno-1.19.1-x86.zip s3://begin-deno-runtime/deno-1.19.1-x86.zip
+      - name: Distribute to regions
+        run: |
+          AWS_REGION=ca-central-1 aws lambda publish-layer-version --layer-name DenoRuntime --content S3Bucket=begin-deno-runtime,S3Key=deno-1.19.1-x86.zip --license-info "Apache-2.0"
+          AWS_REGION=ca-central-1 aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number 39 --principal '*' --action lambda:GetLayerVersion
