@@ -21,8 +21,8 @@ jobs:
          with:
            toolchain: stable  
       
-     - name: Check out Deno source
-       run: echo 'hi'
+#    - name: Check out Deno source
+#      run: echo 'hi'
        
        #git clone -b ${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
 #
