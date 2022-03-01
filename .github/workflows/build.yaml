@@ -16,7 +16,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable  
-      - name: List files in the repository
+      - name: Download and compile Deno
         run: |
           curl -fsSL https://github.com/denoland/deno/releases/download/v1.19.1/deno_src.tar.gz --output deno.tar.gz 
           tar -zxf deno.tar.gz
@@ -28,7 +28,9 @@ jobs:
           chmod +x ${{ github.workspace }}/src/bin/deno
           cp -r ${{ github.workspace }}/src dist
           cd dist
-          zip -r ../deno-1.19.1.zip .
+          zip -r ../deno-1.19.1-x86.zip .
           cd ..
           ls .
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Upload to S3
+        run: |
+          aws s3 cp deno-1.19.1-x86.zip s3://begin-deno-runtime/deno-1.19.1-x86.zip
