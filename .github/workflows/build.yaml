@@ -1,7 +1,7 @@
 name: Deno Runtime Lambda Layer
 on: [push]
 env:
-  version: "1.19.1"
+  version: "1.18.0"
 jobs:
   Deno-Runtime-Build:
     runs-on: ubuntu-latest
@@ -21,10 +21,13 @@ jobs:
         with:
           toolchain: stable  
 
-      - name: Download and compile Deno
+      - name: Download Deno
         run: |
           curl -fsSL https://github.com/denoland/deno/releases/download/v${{ env.version }}/deno_src.tar.gz --output deno.tar.gz 
           tar -zxf deno.tar.gz
+      
+      - name: Compile Deno
+        run: |
           cd deno/cli
           cargo install --locked --root .. --path .
       
