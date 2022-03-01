@@ -18,10 +18,17 @@ jobs:
           toolchain: stable  
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}
-          cargo version
           curl -fsSL https://github.com/denoland/deno/releases/download/v1.19.1/deno_src.tar.gz --output deno.tar.gz 
           tar -zxf deno.tar.gz
           cd deno/cli
           cargo install --locked --root .. --path .
+          cd ../../
+          mkdir -p ${{ github.workspace }}/src/bin
+          cp -r deno/bin/deno ${{ github.workspace }}/src/bin/deno
+          chmod +x ${{ github.workspace }}/src/bin/deno
+          cp -r ${{ github.workspace }}/src dist
+          cd dist
+          zip -r ../deno-1.19.1.zip .
+          cd ..
+          ls .
       - run: echo "🍏 This job's status is ${{ job.status }}."
