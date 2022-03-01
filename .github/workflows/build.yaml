@@ -27,6 +27,7 @@ jobs:
           cargo install --locked --root .. --path .
       
       - name: Build the Lambda Layer
+        run: |
           mkdir -p ${{ github.workspace }}/src/bin
           cp -r deno/bin/deno ${{ github.workspace }}/src/bin/deno
           chmod +x ${{ github.workspace }}/src/bin/deno
