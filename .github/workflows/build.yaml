@@ -18,13 +18,11 @@ jobs:
 
      - name: Setup Rust
        uses: actions-rs/toolchain@v1
-         with:
-           toolchain: stable  
+       with:
+         toolchain: stable  
       
-#    - name: Check out Deno source
-#      run: echo 'hi'
-       
-       #git clone -b ${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
+     - name: Check out Deno source
+       run: git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
 #
 #    - name: Compile Deno
 #      run: |
