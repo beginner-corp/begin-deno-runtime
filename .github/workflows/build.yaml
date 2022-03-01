@@ -1,10 +1,10 @@
 name: Deno Runtime Lambda Layer
 on: [push]
 env:
-  version: "1.17.0"
+  version: "1.19.1"
 jobs:
   Deno-Runtime-Build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
