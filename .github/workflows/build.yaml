@@ -1,5 +1,7 @@
 name: Deno Runtime Lambda Layer
 on: [push]
+env:
+  version: "1.19.1"
 jobs:
   Deno-Runtime-Build:
     runs-on: ubuntu-latest
@@ -20,8 +22,9 @@ jobs:
           toolchain: stable  
 
       - name: Download and compile Deno
+        uses: docker://lambci/lambda:build-provided
         run: |
-          curl -fsSL https://github.com/denoland/deno/releases/download/v1.19.1/deno_src.tar.gz --output deno.tar.gz 
+          curl -fsSL https://github.com/denoland/deno/releases/download/v${{ env.version }}/deno_src.tar.gz --output deno.tar.gz 
           tar -zxf deno.tar.gz
           cd deno/cli
           cargo install --locked --root .. --path .
@@ -33,14 +36,13 @@ jobs:
           chmod +x ${{ github.workspace }}/src/bin/deno
           cp -r ${{ github.workspace }}/src dist
           cd dist
-          zip -r ../deno-1.19.1-x86.zip .
+          zip -r ../deno-${{ env.version }}-x86.zip .
 
       - name: Upload to S3
         run: |
-          aws s3 cp deno-1.19.1-x86.zip s3://begin-deno-runtime/deno-1.19.1-x86.zip
+          aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
 
       - name: Publish ca-central-1
         run: |
-          v="$(AWS_REGION=ca-central-1 aws lambda publish-layer-version --layer-name DenoRuntime --zip-file fileb://deno-1.19.1-x86.zip --license-info "Apache-2.0" --query 'Version')"
-          echo $v
+          v="$(AWS_REGION=ca-central-1 aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version')"
           AWS_REGION=ca-central-1 aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion
