@@ -26,9 +26,10 @@ jobs:
 
       - name: Compile Deno
         run: |
+          pwd
+          ls
           cd deno
-          cargo clean
-          cargo build -r
+          cargo build --release
  
 #    - name: Build the Lambda Layer
 #      run: |
