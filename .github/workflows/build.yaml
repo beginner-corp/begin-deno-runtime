@@ -16,14 +16,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2 
 
-#    - name: Setup Rust
-#      uses: actions-rs/toolchain@v1
-#        with:
-#          toolchain: stable  
-#     
-#    - name: Check out Deno source
-#      run: |
-#        git clone -b v${{ version }} --recurse-submodules https://github.com/denoland/deno.git
+     - name: Setup Rust
+       uses: actions-rs/toolchain@v1
+         with:
+           toolchain: stable  
+      
+     - name: Check out Deno source
+       run: |
+         git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
 #
 #    - name: Compile Deno
 #      run: |
