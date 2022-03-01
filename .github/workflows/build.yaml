@@ -1,7 +1,7 @@
 name: Deno Runtime Lambda Layer
 on: [push]
 env:
-  version: "1.19.1"
+  version: "1.19.0"
 jobs:
   Deno-Runtime-Build:
     runs-on: ubuntu-latest
@@ -39,25 +39,7 @@ jobs:
          cp -r ${{ github.workspace }}/src dist
          cd dist
          zip -r ../deno-${{ env.version }}-x86.zip .      #- name: Download Deno
-     #  run: |
-     #    curl -fsSL https://github.com/denoland/deno/releases/download/v${{ env.version }}/deno-x86_64-unknown-linux-gnu.zip --output deno.zip
-     #    unzip deno.zip
-     # 
-     #- name: Compile Deno
-     #  run: |
-     #    apt install libglib2.0-dev
-     #    cd deno/cli
-     #    cargo install --locked --root .. --path .
-     #
-     #- name: Build the Lambda Layer
-     #  run: |
-     #    ls -lah
-     #    mkdir -p ${{ github.workspace }}/src/bin
-     #    cp deno ${{ github.workspace }}/src/bin/deno
-     #    cp -r ${{ github.workspace }}/src dist
-     #    cd dist
-     #    zip -r ../deno-${{ env.version }}-x86.zip .
-     #
+
       - name: Upload to S3
         run: |
           aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
