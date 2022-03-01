@@ -23,13 +23,13 @@ jobs:
       
       - name: Check out Deno source
         run: git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
-#
-#    - name: Compile Deno
-#      run: |
-#        cd deno
-#        cargo clean
-#        cargo build -r
-#
+
+      - name: Compile Deno
+        run: |
+          cd deno
+          cargo clean
+          cargo build -r
+ 
 #    - name: Build the Lambda Layer
 #      run: |
 #        ls -lah
