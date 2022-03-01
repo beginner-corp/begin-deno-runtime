@@ -21,6 +21,12 @@ jobs:
         with:
           toolchain: stable  
       
+      - name: Patch glibc
+        run: |
+          apt-get update
+          apt-cache policy libc6
+          apt-get install libc6
+      
       - name: Check out Deno source
         run: git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
 
