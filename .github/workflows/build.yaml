@@ -4,7 +4,7 @@ env:
   version: "1.19.0"
 jobs:
   Deno-Runtime-Build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
