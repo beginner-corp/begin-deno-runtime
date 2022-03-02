@@ -30,12 +30,10 @@ jobs:
  
       - name: Build the Lambda Layer
         run: |
-          pwd
-          ls -lah .
           mkdir -p src/bin
           cp deno/target/release/deno src/bin/deno
-          ls -lah src
-          zip -r deno-${{ env.version }}-x86.zip src/ 
+          cd src
+          zip -r ../deno-${{ env.version }}-x86.zip .
 
       - name: Upload to S3
         run: |
