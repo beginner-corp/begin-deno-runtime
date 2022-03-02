@@ -21,30 +21,21 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable  
-      
-#      - name: Patch glibc
-#        run: |
-#          sudo apt-get update
-#          sudo apt-cache policy libc6
-#          sudo apt-get install libc6
-      
-      - name: Check out Deno source
-        run: git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
 
       - name: Compile Deno
         run: |
+          git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
           cd deno
           cargo build --release
-          pwd
-          ls
  
       - name: Build the Lambda Layer
         run: |
           pwd
-          mkdir -p ${{ github.workspace }}/src/bin
-          cp deno/target/release/deno ${{ github.workspace }}/src/bin/deno
-          ls -lah ${{ github.workspace }}/src
-          zip -r deno-${{ env.version }}-x86.zip ${{ github.workspace }}/src/      
+          ls -lah .
+          mkdir -p src/bin
+          cp deno/target/release/deno src/bin/deno
+          ls -lah src
+          zip -r deno-${{ env.version }}-x86.zip src/ 
 
       - name: Upload to S3
         run: |
