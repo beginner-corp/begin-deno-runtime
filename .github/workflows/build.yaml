@@ -5,7 +5,7 @@ env:
 jobs:
   Deno-Runtime-Build:
     runs-on: ubuntu-latest
-    container: docker://lambci/lambda:build-provided.al2
+    container: docker://lambci/lambda:build-provided
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -43,3 +43,24 @@ jobs:
         run: |
           v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region ca-central-1)"
           aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region ca-central-1
+#
+#     - name: Publish us-east-1
+#       run: |
+#         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-east-1)"
+#         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-east-1
+#
+#     - name: Publish us-west-1
+#       run: |
+#         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-west-1)"
+#         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-west-1
+#
+#     - name: Publish us-east-2
+#       run: |
+#         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-east-2)"
+#         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-east-2
+#
+#     - name: Publish us-west-2
+#       run: |
+#         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-west-2)"
+#         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-west-2
+#
