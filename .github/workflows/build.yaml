@@ -35,16 +35,16 @@ jobs:
         run: |
           cd deno
           cargo build --release
-          cd ..
           pwd
+          ls
  
       - name: Build the Lambda Layer
         run: |
           pwd
           mkdir -p ${{ github.workspace }}/src/bin
           cp deno/target/release/deno ${{ github.workspace }}/src/bin/deno
-          ls -lah src
-          zip -r deno-${{ env.version }}-x86.zip src/      
+          ls -lah ${{ github.workspace }}/src
+          zip -r deno-${{ env.version }}-x86.zip ${{ github.workspace }}/src/      
 
       - name: Upload to S3
         run: |
