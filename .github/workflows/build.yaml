@@ -1,10 +1,11 @@
 name: Deno Runtime Lambda Layer
 on: [push]
 env:
-  version: "1.19.0"
+  version: "1.18.0"
 jobs:
   Deno-Runtime-Build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    container: docker://lambci/lambda:build-provided.al2
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -21,11 +22,11 @@ jobs:
         with:
           toolchain: stable  
       
-      - name: Patch glibc
-        run: |
-          sudo apt-get update
-          sudo apt-cache policy libc6
-          sudo apt-get install libc6
+#      - name: Patch glibc
+#        run: |
+#          sudo apt-get update
+#          sudo apt-cache policy libc6
+#          sudo apt-get install libc6
       
       - name: Check out Deno source
         run: git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
