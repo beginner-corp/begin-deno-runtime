@@ -1,5 +1,8 @@
 name: Deno Runtime Lambda Layer
-on: [push]
+on: 
+  push:
+    paths-ignore:
+      - '**/readme.md' # ignore changes to readme so this action can update the readme!
 env:
   version: "1.19.1"
 jobs:
@@ -64,3 +67,15 @@ jobs:
           v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-west-2)"
           aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-west-2
 
+          # ap-south-1
+          # ap-northeast-3
+          # ap-northeast-2
+          # ap-southeast-1
+          # ap-southeast-2
+          # ap-northeast-1
+          # eu-central-1
+          # eu-west-1
+          # eu-west-2
+          # eu-north-1
+          # eu-west-3
+          # sa-east-1
