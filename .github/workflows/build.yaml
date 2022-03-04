@@ -25,6 +25,11 @@ jobs:
         with:
           toolchain: stable  
 
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Compile Deno
         run: |
           git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
@@ -67,10 +72,9 @@ jobs:
           v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-west-2)"
           aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-west-2
 
-      - name: Update readme.md
-        run: |
+      - run: |
           npm i
-          GITHUB_TOKEN=${{ github.token }} node scripts/get-versions.js
+          GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js
           # ap-south-1
           # ap-northeast-3
           # ap-northeast-2
