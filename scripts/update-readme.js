@@ -51,14 +51,15 @@ async function write(md) {
     accept: 'application/vnd.github.v3+json'
   }
 
-  console.log(headers)
 
   try {
+    console.log('.....BEFORE')
     // get the sha of the readme
     let { sha } = await tiny.get({
       url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/readme`,
       headers,
     }) 
+    console.log('.....after before!', sha)
 
     // write the readme
     return tiny.put({
