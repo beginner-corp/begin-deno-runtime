@@ -51,28 +51,20 @@ async function write(md) {
     accept: 'application/vnd.github.v3+json'
   }
 
+  // get the sha of the readme
+  let { body } = await tiny.get({
+    url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/readme`,
+    headers,
+  }) 
 
-  try {
-    console.log('.....BEFORE')
-    // get the sha of the readme
-    let result = await tiny.get({
-      url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/readme`,
-      headers,
-    }) 
-    console.log('.....after before!', result)
-
-    // write the readme
-    return tiny.put({
-      url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/contents/readme.md`,
-      headers,
-      data: {
-        sha,
-        message: `update readme`,
-        content: Buffer.from(md).toString('base64')
-      }
-    })
-  }
-  catch (e) {
-    console.log(e, e.raw)
-  }
+  // write the readme
+  return tiny.put({
+    url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/contents/readme.md`,
+    headers,
+    data: {
+      sha: body.sha,
+      message: `update readme`,
+      content: Buffer.from(md).toString('base64')
+    }
+  })
 }
