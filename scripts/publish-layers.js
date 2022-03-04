@@ -3,6 +3,15 @@ let fs = require('fs')
 let path = require('path')
 let regions = require('./supported-regions')
 
+// read the zip
+let pathToFile = path.join(__dirname, '..', `deno-${process.env.version}-x86.zip`)
+if (fs.existsSync(pathToFile) === false) {
+  console.log('missing zip file')
+  process.exit()
+}
+let file = fs.readFileSync(pathToFile)
+console.log('got file', file)
+
 ;(async function () {
   for (let region of regions) {
     let result = await publish(region)
@@ -14,10 +23,6 @@ async function publish (region) {
   console.log('publish to layer to', region)
   try {
     let lambda = new aws.Lambda({ region })
- 
-    // read the zip
-    let pathToFile = path.join(__dirname, '..', `deno-${process.env.version}-x86.zip`)
-    let file = fs.readFileSync(pathToFile).toString('base64')
  
     // publish the zip
     let { Version } = await lambda.publishLayerVersion({
