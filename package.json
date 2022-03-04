@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "aws-sdk": "^2.1086.0",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "tiny-json-http": "^7.3.1"
   }
 }

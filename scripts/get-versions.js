@@ -1,5 +1,6 @@
 let aws = require('aws-sdk')
 let semver = require('semver')
+let tiny = require('tiny-json-http')
 
 let regions = [
   'us-east-1',
@@ -35,7 +36,7 @@ let regions = [
       md += `\n`
     }
   }
-  console.log(md)
+  await write(md)
 })();
 
 /** get all the DenoRuntime layer versions for given region */
@@ -59,4 +60,19 @@ async function getAllVersions(region) {
   }
   await getPage(params)
   return results
+}
+
+/** helper to write the readme using the github api */
+async function write(md) {
+  return tiny.put({
+    url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/contents/readme.md`,
+    headers: {
+     Authorization: `token ${ process.env.GITHUB_TOKEN }`,
+     Accept: 'application/json'
+    },
+    data: {
+      message: `update readme`,
+      content: Buffer.from(md).toString('base64')
+    }
+  })
 }
