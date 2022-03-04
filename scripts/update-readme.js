@@ -1,26 +1,7 @@
 let aws = require('aws-sdk')
 let semver = require('semver')
 let tiny = require('tiny-json-http')
-
-let regions = [
-  'us-east-1',
-  'us-east-2',
-  'us-west-1',
-  'us-west-2',
-  'ca-central-1',
-  'ap-south-1',
-  'ap-northeast-3',
-  'ap-northeast-2',
-  'ap-southeast-1',
-  'ap-southeast-2',
-  'ap-northeast-1',
-  'eu-central-1',
-  'eu-west-1',
-  'eu-west-2',
-  'eu-north-1',
-  'eu-west-3',
-  'sa-east-1',
-]
+let regions = require('./supported-regions')
 
 ;(async function() {
   let md = '# DenoRuntime Lambda Layer\n\n'
@@ -70,20 +51,27 @@ async function write(md) {
     accept: 'application/vnd.github.v3+json'
   }
 
-  // get the sha of the readme
-  let { sha } = await tiny.get({
-    url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/readme`,
-    headers,
-  }) 
+  console.log(headers)
 
-  // write the readme
-  return tiny.put({
-    url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/contents/readme.md`,
-    headers,
-    data: {
-      sha,
-      message: `update readme`,
-      content: Buffer.from(md).toString('base64')
-    }
-  })
+  try {
+    // get the sha of the readme
+    let { sha } = await tiny.get({
+      url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/readme`,
+      headers,
+    }) 
+
+    // write the readme
+    return tiny.put({
+      url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/contents/readme.md`,
+      headers,
+      data: {
+        sha,
+        message: `update readme`,
+        content: Buffer.from(md).toString('base64')
+      }
+    })
+  }
+  catch (e) {
+    console.log(e, e.raw)
+  }
 }
