@@ -4,7 +4,7 @@ let path = require('path')
 let regions = require('./supported-regions')
 
 ;(async function () {
-  for (let region in regions) {
+  for (let region of regions) {
     let result = await publish(region)
     console.log(result)
   }
