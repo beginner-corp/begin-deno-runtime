@@ -12,7 +12,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-
+      
+      # these secrets are setup at the org level
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -20,59 +21,43 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2 
 
+      # we need rust to build deno
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable  
 
+      # uses node for interacting w the aws-sdk and github apis 
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: '14'
 
-          #     - name: Compile Deno
-          #       run: |
-          #         git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
-          #         cd deno
-          #         cargo build --release
- 
-          #     - name: Build the Lambda Layer
-          #       run: |
-          #         mkdir -p src/bin
-          #         cp deno/target/release/deno src/bin/deno
-          #         cd src
-          #         zip -r ../deno-${{ env.version }}-x86.zip .
-
-          #     - name: Upload to S3
-          #       run: |
-          #         aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
-
-          #     - name: Publish ca-central-1
-          #       run: |
-          #         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region ca-central-1)"
-          #         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region ca-central-1
-
-          #     - name: Publish us-east-1
-          #       run: |
-          #         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-east-1)"
-          #         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-east-1
-
-          #     - name: Publish us-west-1
-          #       run: |
-          #         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-west-1)"
-          #         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-west-1
-
-          #     - name: Publish us-east-2
-          #       run: |
-          #         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-east-2)"
-          #         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-east-2
-
-          #     - name: Publish us-west-2
-          #       run: |
-          #         v="$(aws lambda publish-layer-version --description ${{ env.version }}-x86 --layer-name DenoRuntime --zip-file fileb://deno-${{ env.version }}-x86.zip --license-info "Apache-2.0" --query 'Version' --region us-west-2)"
-          #         aws lambda add-layer-version-permission --layer-name DenoRuntime --statement-id allow-every1 --version-number $v --principal '*' --action lambda:GetLayerVersion --region us-west-2
-
-      - name: Updates readme.md
+      - name: Compile Deno
         run: |
-          npm i
+          git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
+          cd deno
+          cargo build --release
+ 
+      - name: Build the Lambda Layer
+        run: |
+          mkdir -p src/bin
+          cp deno/target/release/deno src/bin/deno
+          cd src
+          zip -r ../deno-${{ env.version }}-x86.zip .
+
+      # this is just backups for debugging purposes
+      - name: Upload to S3
+        run: |
+          aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
+
+      # iterates through regions adding layers to each
+      - name: Publish layers and update readme.md
+        run: |
+          npm install
+          node scripts/publish-layers.js
+
+      # update the repo readme with deno version -> arn list organized by region
+      - name: Update readme.md
+        run: |
           GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js

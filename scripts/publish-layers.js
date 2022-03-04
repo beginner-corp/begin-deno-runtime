@@ -1,28 +1,38 @@
 let aws = require('aws-sdk')
+let fs = require('fs')
+let path = require('path')
 let regions = require('./supported-regions')
 
 ;(async function () {
   for (let region in regions) {
-    await publish(region)
+    let result = await publish(region)
+    console.log(result)
   }
 })();
 
 async function publish (region) {
-  let lambda = new aws.Lambda({ region })
-  let verg
-}
-publish-layer-version 
---description ${{ env.version }}-x86 
---layer-name DenoRuntime 
---zip-file fileb://deno-${{ env.version }}-x86.zip 
---license-info "Apache-2.0" 
---query 'Version' 
---region us-west-2
 
-add-layer-version-permission 
---layer-name DenoRuntime 
---statement-id allow-every1 
---version-number $v 
---principal '*' 
---action lambda:GetLayerVersion 
---region us-west-2
+  let lambda = new aws.Lambda({ region })
+
+  // read the zip
+  let pathToFile = path.join(__dirname, '..', `deno-${process.env.version}-x86.zip`)
+  let file = fs.readFileSync(pathToFile).toString('base64')
+
+  // publish the zip
+  let { Version } = await lambda.publishLayerVersion({
+    LayerName: `DenoRuntime`,
+    Description: `${ process.env.version }-x86`,
+    CompatibleArchitectures: ['x86_64'],
+    Content: { ZipFile: file },
+    LicenseInfo: 'Apache-2.0' 
+  }).promise()
+
+  // reset the permissions
+  return lambda.addLayerVersionPermission({
+    Action: 'lambda:GetLayerVersion'
+    LayerName: `DenoRuntime`,
+    Principal: '*',
+    StatementId: `allow-${ Date.now() }`,
+    VersionNumber: Version,
+  }).promise()
+}
