@@ -2,15 +2,8 @@ let aws = require('aws-sdk')
 let fs = require('fs')
 let path = require('path')
 let regions = require('./supported-regions')
-
-// read the zip
 let pathToFile = path.join(__dirname, '..', `deno-${process.env.version}-x86.zip`)
-if (fs.existsSync(pathToFile) === false) {
-  console.log('missing zip file')
-  process.exit()
-}
-let file = fs.readFileSync(pathToFile)
-console.log('got file', file)
+let layer = fs.readFileSync(pathToFile)
 
 ;(async function () {
   for (let region of regions) {
@@ -19,6 +12,7 @@ console.log('got file', file)
   }
 })();
 
+/** helper to publish layer code and blow open the permissions so anyone can use it */
 async function publish (region) {
   console.log('publish to layer to', region)
   try {
@@ -28,9 +22,9 @@ async function publish (region) {
     let { Version } = await lambda.publishLayerVersion({
       LayerName: `DenoRuntime`,
       Description: `${ process.env.version }-x86`,
-      CompatibleArchitectures: ['x86_64'],
-      Content: { ZipFile: file },
+      Content: { ZipFile: layer },
       LicenseInfo: 'Apache-2.0' 
+      // CompatibleArchitectures: ['x86_64'], this is not yet supported in all regions!
     }).promise()
  
     // reset the permissions
