@@ -64,13 +64,24 @@ async function getAllVersions(region) {
 
 /** helper to write the readme using the github api */
 async function write(md) {
+
+  let headers = {
+    authorization: `token ${ process.env.GITHUB_TOKEN }`,
+    accept: 'application/vnd.github.v3+json'
+  }
+
+  // get the sha of the readme
+  let { sha } = await tiny.get({
+    url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/readme`,
+    headers,
+  }) 
+
+  // write the readme
   return tiny.put({
     url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/contents/readme.md`,
-    headers: {
-     Authorization: `token ${ process.env.GITHUB_TOKEN }`,
-     Accept: 'application/json'
-    },
+    headers,
     data: {
+      sha,
       message: `update readme`,
       content: Buffer.from(md).toString('base64')
     }
