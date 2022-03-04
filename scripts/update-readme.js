@@ -55,11 +55,11 @@ async function write(md) {
   try {
     console.log('.....BEFORE')
     // get the sha of the readme
-    let { sha } = await tiny.get({
+    let result = await tiny.get({
       url: `https://api.github.com/repos/beginner-corp/begin-deno-runtime/readme`,
       headers,
     }) 
-    console.log('.....after before!', sha)
+    console.log('.....after before!', result)
 
     // write the readme
     return tiny.put({
