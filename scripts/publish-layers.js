@@ -29,7 +29,7 @@ async function publish (region) {
 
   // reset the permissions
   return lambda.addLayerVersionPermission({
-    Action: 'lambda:GetLayerVersion'
+    Action: 'lambda:GetLayerVersion',
     LayerName: `DenoRuntime`,
     Principal: '*',
     StatementId: `allow-${ Date.now() }`,
