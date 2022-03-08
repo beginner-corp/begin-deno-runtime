@@ -27,15 +27,6 @@ async function publish (region) {
       // CompatibleArchitectures: ['x86_64'], this is not yet supported in all regions!
     }).promise()
 
-    // reset the permissions
-    await lambda.addLayerVersionPermission({
-      Action: 'lambda:ListLayerVersions',
-      LayerName: `DenoRuntime`,
-      Principal: '*',
-      StatementId: `allow-${ Date.now() }`,
-      VersionNumber: Version,
-    }).promise() 
-
     return lambda.addLayerVersionPermission({
       Action: 'lambda:GetLayerVersion',
       LayerName: `DenoRuntime`,
