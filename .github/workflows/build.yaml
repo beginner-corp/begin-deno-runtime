@@ -4,7 +4,7 @@ on:
     paths-ignore:
       - '**/readme.md' # ignore changes to readme so this action can update the readme!
 env:
-  version: "1.19.1"
+  version: "1.19.2"
 jobs:
   Deno-Runtime-Build:
     runs-on: ubuntu-latest
@@ -38,6 +38,10 @@ jobs:
           git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
           cd deno
           cargo build --release
+
+      - name: Verify the build
+        run: |
+          ./deno/garget/release/deno --version 
  
       - name: Build the Lambda Layer
         run: |
