@@ -41,7 +41,7 @@ jobs:
 
       - name: Verify the build
         run: |
-          ./deno/garget/release/deno --version 
+          ./deno/target/release/deno --version 
  
       - name: Build the Lambda Layer
         run: |
