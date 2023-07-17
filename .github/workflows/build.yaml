@@ -37,7 +37,7 @@ jobs:
         run: |
           git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
           cd deno
-          cargo build --release
+          V8_FROM_SOURCE=1 cargo build --release
 
       - name: Verify the build
         run: |
