@@ -1,18 +1,47 @@
 name: Deno Runtime Lambda Layer
+
 on:
   push:
     paths-ignore:
       - '**/readme.md' # ignore changes to readme so this action can update the readme!
+
 env:
   version: "1.35.0"
+
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     container: docker://public.ecr.aws/lambda/provided
     steps:
       - name: Install necessary packages
-        run: yum install awscli gzip tar unzip zip -y
+        run: yum install gzip tar unzip zip -y
 
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Download Deno
+        run: curl -fsSL https://deno.land/x/install/install.sh | sh -s v${{ env.version }}
+
+      - name: Verify the build
+        run: /github/home/.deno/bin/deno --version
+
+      - name: Build the Lambda Layer
+        run: |
+          mkdir -p src/bin
+          cp /github/home/.deno/bin/deno src/bin/deno
+          cd src
+          zip -r ../deno-${{ env.version }}-x86.zip .
+
+      - name: Persist layer artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: layer
+          path: ../deno-${{ env.version }}-x86.zip
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Check out repo
         uses: actions/checkout@v3
 
@@ -30,31 +59,29 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Download Deno
-        run: curl -fsSL https://deno.land/x/install/install.sh | sh -s v${{ env.version }}
+      - name: Get layer artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: layer
 
-      - name: Verify the build
-        run: /github/home/.deno/bin/deno --version
-
-      - name: Build the Lambda Layer
-        run: |
-          mkdir -p src/bin
-          cp /github/home/.deno/bin/deno src/bin/deno
-          cd src
-          zip -r ../deno-${{ env.version }}-x86.zip .
+      - name: Test artifact
+        run: ls -lah
 
       # this is just backups for debugging purposes
       - name: Upload to S3
         run: |
           aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
 
-      # iterates through regions adding layers to each
-      - name: Publish layer to all AWS regions
-        run: |
-          npm install
-          node scripts/publish-layers.js
+      - name: Test node
+        run: node --version
 
-      # update the repo readme with deno version -> arn list organized by region
-      - name: Update readme.md
-        run: |
-          GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js
+      # # iterates through regions adding layers to each
+      # - name: Publish layer to all AWS regions
+      #   run: |
+      #     npm install
+      #     node scripts/publish-layers.js
+
+      # # update the repo readme with deno version -> arn list organized by region
+      # - name: Update readme.md
+      #   run: |
+      #     GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js
