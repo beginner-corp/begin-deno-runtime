@@ -64,24 +64,18 @@ jobs:
         with:
           name: layer
 
-      - name: Test artifact
-        run: ls -lah
-
       # this is just backups for debugging purposes
       - name: Upload to S3
         run: |
           aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
 
-      - name: Test node
-        run: node --version
+      # iterates through regions adding layers to each
+      - name: Publish layer to all AWS regions
+        run: |
+          npm install
+          node scripts/publish-layers.js
 
-      # # iterates through regions adding layers to each
-      # - name: Publish layer to all AWS regions
-      #   run: |
-      #     npm install
-      #     node scripts/publish-layers.js
-
-      # # update the repo readme with deno version -> arn list organized by region
-      # - name: Update readme.md
-      #   run: |
-      #     GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js
+      # update the repo readme with deno version -> arn list organized by region
+      - name: Update readme.md
+        run: |
+          GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js

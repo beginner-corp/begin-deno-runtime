@@ -17,13 +17,13 @@ async function publish (region) {
   console.log('publish to layer to', region)
   try {
     let lambda = new aws.Lambda({ region })
- 
+
     // publish the zip
     let { Version } = await lambda.publishLayerVersion({
       LayerName: `DenoRuntime`,
       Description: `${ process.env.version }-x86`,
       Content: { ZipFile: layer },
-      LicenseInfo: 'Apache-2.0' 
+      LicenseInfo: 'Apache-2.0'
       // CompatibleArchitectures: ['x86_64'], this is not yet supported in all regions!
     }).promise()
 
