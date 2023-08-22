@@ -3,10 +3,10 @@
     "test": "tape test/*-test.js | tap-spec"
   },
   "dependencies": {
-    "aws-sdk": "^2.1086.0",
-    "semver": "^7.3.5",
+    "aws-sdk": "2.1364.0",
+    "semver": "^7.5.4",
     "tap-spec": "^5.0.0",
-    "tape": "^5.5.2",
-    "tiny-json-http": "^7.3.1"
+    "tape": "^5.6.6",
+    "tiny-json-http": "^7.5.1"
   }
 }
