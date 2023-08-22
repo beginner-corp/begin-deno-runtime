@@ -1,67 +1,70 @@
 name: Deno Runtime Lambda Layer
-on: 
+on:
   push:
     paths-ignore:
       - '**/readme.md' # ignore changes to readme so this action can update the readme!
 env:
   version: "1.35.0"
 jobs:
-  Deno-Runtime-Build:
+  publish:
     runs-on: ubuntu-latest
-    container: docker://lambci/lambda:build-provided # build works for lambda:build-provided.al2 also
+    container: docker://public.ecr.aws/lambda/provided
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      
-      # these secrets are setup at the org level
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2 
+      - name: Testing 123
+        run: echo testing 123 && whereis yum
 
-      # we need rust to build deno
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable  
+      # - name: Check out repository code
+      #   uses: actions/checkout@v2
 
-      # uses node for interacting w the aws-sdk and github apis 
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      # # these secrets are setup at the org level
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
 
-      - name: Compile Deno
-        run: |
-          git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
-          cd deno
-          V8_FROM_SOURCE=1 cargo build --release
+      # # we need rust to build deno
+      # - name: Setup Rust
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
 
-      - name: Verify the build
-        run: |
-          ./deno/target/release/deno --version 
- 
-      - name: Build the Lambda Layer
-        run: |
-          mkdir -p src/bin
-          cp deno/target/release/deno src/bin/deno
-          cd src
-          zip -r ../deno-${{ env.version }}-x86.zip .
+      # # uses node for interacting w the aws-sdk and github apis
+      # - name: Setup Node
+      #   uses: actions/setup-node@v2
+      #   with:
+      #     node-version: '18'
 
-      # this is just backups for debugging purposes
-      - name: Upload to S3
-        run: |
-          aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
+      # - name: Compile Deno
+      #   run: |
+      #     git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
+      #     cd deno
+      #     V8_FROM_SOURCE=1 cargo build --release
 
-      # iterates through regions adding layers to each
-      - name: Publish layer to all AWS regions
-        run: |
-          npm install
-          node scripts/publish-layers.js
+      # - name: Verify the build
+      #   run: |
+      #     ./deno/target/release/deno --version
 
-      # update the repo readme with deno version -> arn list organized by region
-      - name: Update readme.md
-        run: |
-          GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js
+      # - name: Build the Lambda Layer
+      #   run: |
+      #     mkdir -p src/bin
+      #     cp deno/target/release/deno src/bin/deno
+      #     cd src
+      #     zip -r ../deno-${{ env.version }}-x86.zip .
+
+      # # this is just backups for debugging purposes
+      # - name: Upload to S3
+      #   run: |
+      #     aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
+
+      # # iterates through regions adding layers to each
+      # - name: Publish layer to all AWS regions
+      #   run: |
+      #     npm install
+      #     node scripts/publish-layers.js
+
+      # # update the repo readme with deno version -> arn list organized by region
+      # - name: Update readme.md
+      #   run: |
+      #     GITHUB_TOKEN=${{ github.token }} node scripts/update-readme.js
