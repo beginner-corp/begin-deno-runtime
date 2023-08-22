@@ -31,22 +31,22 @@ jobs:
           node-version: '18'
 
       - name: Download Deno
-        run: curl -fsSL https://deno.land/x/install/install.sh | sh
+        run: curl -fsSL https://deno.land/x/install/install.sh | sh -s v${{ env.version }}
 
       - name: Verify the build
         run: /github/home/.deno/bin/deno --version
 
-      # - name: Build the Lambda Layer
-      #   run: |
-      #     mkdir -p src/bin
-      #     cp /github/home/.deno/bin/deno src/bin/deno
-      #     cd src
-      #     zip -r ../deno-${{ env.version }}-x86.zip .
+      - name: Build the Lambda Layer
+        run: |
+          mkdir -p src/bin
+          cp /github/home/.deno/bin/deno src/bin/deno
+          cd src
+          zip -r ../deno-${{ env.version }}-x86.zip .
 
-      # # this is just backups for debugging purposes
-      # - name: Upload to S3
-      #   run: |
-      #     aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
+      # this is just backups for debugging purposes
+      - name: Upload to S3
+        run: |
+          aws s3 cp deno-${{ env.version }}-x86.zip s3://begin-deno-runtime/deno-${{ env.version }}-x86.zip
 
       # # iterates through regions adding layers to each
       # - name: Publish layer to all AWS regions
