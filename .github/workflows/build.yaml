@@ -10,46 +10,36 @@ jobs:
     runs-on: ubuntu-latest
     container: docker://public.ecr.aws/lambda/provided
     steps:
-      - name: Testing 123
-        run: echo testing 123 && whereis yum
+      - name: Install necessary packages
+        run: yum install gzip tar unzip zip -y
 
-      # - name: Check out repository code
-      #   uses: actions/checkout@v2
+      - name: Check out repo
+        uses: actions/checkout@v3
 
-      # # these secrets are setup at the org level
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-west-2
+      # these secrets are set up at the org level
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
 
-      # # we need rust to build deno
-      # - name: Setup Rust
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: stable
+      # uses node for interacting w the aws-sdk and github apis
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      # # uses node for interacting w the aws-sdk and github apis
-      # - name: Setup Node
-      #   uses: actions/setup-node@v2
-      #   with:
-      #     node-version: '18'
+      - name: Download Deno
+        run: curl -fsSL https://deno.land/x/install/install.sh | sh
 
-      # - name: Compile Deno
-      #   run: |
-      #     git clone -b v${{ env.version }} --recurse-submodules https://github.com/denoland/deno.git
-      #     cd deno
-      #     V8_FROM_SOURCE=1 cargo build --release
-
-      # - name: Verify the build
-      #   run: |
-      #     ./deno/target/release/deno --version
+      - name: Verify the build
+        run: /root/.deno/bin/deno --version
 
       # - name: Build the Lambda Layer
       #   run: |
       #     mkdir -p src/bin
-      #     cp deno/target/release/deno src/bin/deno
+      #     cp /root/.deno/bin/deno src/bin/deno
       #     cd src
       #     zip -r ../deno-${{ env.version }}-x86.zip .
 
