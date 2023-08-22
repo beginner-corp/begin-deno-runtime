@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: layer
-          path: ../deno-${{ env.version }}-x86.zip
+          path: deno-${{ env.version }}-x86.zip
 
   publish:
     needs: build
