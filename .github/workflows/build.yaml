@@ -34,12 +34,12 @@ jobs:
         run: curl -fsSL https://deno.land/x/install/install.sh | sh
 
       - name: Verify the build
-        run: /root/.deno/bin/deno --version
+        run: /github/home/.deno/bin/deno --version
 
       # - name: Build the Lambda Layer
       #   run: |
       #     mkdir -p src/bin
-      #     cp /root/.deno/bin/deno src/bin/deno
+      #     cp /github/home/.deno/bin/deno src/bin/deno
       #     cd src
       #     zip -r ../deno-${{ env.version }}-x86.zip .
 
