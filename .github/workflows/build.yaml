@@ -11,7 +11,7 @@ jobs:
     container: docker://public.ecr.aws/lambda/provided
     steps:
       - name: Install necessary packages
-        run: yum install gzip tar unzip zip -y
+        run: yum install awscli gzip tar unzip zip -y
 
       - name: Check out repo
         uses: actions/checkout@v3
