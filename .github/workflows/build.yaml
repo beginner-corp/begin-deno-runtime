@@ -6,7 +6,7 @@ on:
       - '**/readme.md' # ignore changes to readme so this action can update the readme!
 
 env:
-  version: "1.35.0"
+  version: "1.36.2"
 
 jobs:
   build:
